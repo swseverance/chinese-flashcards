@@ -9,12 +9,10 @@ import {
   ReadFlashcard,
   UpdateFlashcard,
   UpdateFlashcardArgs,
-  WriteFlashcard
+  WriteFlashcard,
 } from './models';
 
 initializeApp();
-
-const enforceAppCheck = process.env.FUNCTIONS_EMULATOR !== 'true';
 
 const toneMap: Record<string, string> = {
   ā: 'a',
@@ -66,7 +64,7 @@ const toneMap: Record<string, string> = {
   Ǘ: 'U',
   Ǚ: 'U',
   Ǜ: 'U',
-  Ü: 'U'
+  Ü: 'U',
 };
 
 const toSearch = (pinyin: string) =>
@@ -83,12 +81,14 @@ const toFlashcard = (id: string, data: ReadFlashcard): Flashcard => {
     id,
     created: data.created.toDate().toISOString(),
     lastUpdated: data.lastUpdated.toDate().toISOString(),
-    search: toSearch(data.pinyin)
+    search: toSearch(data.pinyin),
   };
 };
 
+const OPTIONS = { enforceAppCheck: true, maxInstances: 1 };
+
 exports.create = onCall<CreateFlashcardArgs>(
-  { enforceAppCheck, maxInstances: 1 },
+  OPTIONS,
   async (req): Promise<{ flashcard: Flashcard }> => {
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Must be signed in');
@@ -106,7 +106,7 @@ exports.create = onCall<CreateFlashcardArgs>(
       uid: req.auth.uid,
       confidence: 0,
       created: FieldValue.serverTimestamp(),
-      lastUpdated: FieldValue.serverTimestamp()
+      lastUpdated: FieldValue.serverTimestamp(),
     } satisfies WriteFlashcard);
 
     const snap = await ref.get();
@@ -114,34 +114,26 @@ exports.create = onCall<CreateFlashcardArgs>(
     logger.info('flashcard created', { id: ref.id, uid: req.auth.uid });
 
     return { flashcard: toFlashcard(ref.id, snap.data() as ReadFlashcard) };
-  }
+  },
 );
 
-exports.get = onCall(
-  { enforceAppCheck, maxInstances: 1 },
-  async (req): Promise<{ flashcards: Flashcard[] }> => {
-    if (!req.auth) {
-      throw new HttpsError('unauthenticated', 'Must be signed in');
-    }
-
-    const db = getFirestore();
-    const snap = await db
-      .collection('flashcards')
-      .where('uid', '==', req.auth.uid)
-      .get();
-
-    logger.info('flashcards fetched', { uid: req.auth.uid, count: snap.size });
-
-    return {
-      flashcards: snap.docs.map((doc) =>
-        toFlashcard(doc.id, doc.data() as ReadFlashcard)
-      )
-    };
+exports.get = onCall(OPTIONS, async (req): Promise<{ flashcards: Flashcard[] }> => {
+  if (!req.auth) {
+    throw new HttpsError('unauthenticated', 'Must be signed in');
   }
-);
+
+  const db = getFirestore();
+  const snap = await db.collection('flashcards').where('uid', '==', req.auth.uid).get();
+
+  logger.info('flashcards fetched', { uid: req.auth.uid, count: snap.size });
+
+  return {
+    flashcards: snap.docs.map((doc) => toFlashcard(doc.id, doc.data() as ReadFlashcard)),
+  };
+});
 
 exports.update = onCall<UpdateFlashcardArgs>(
-  { enforceAppCheck, maxInstances: 1 },
+  OPTIONS,
   async (req): Promise<{ flashcard: Flashcard }> => {
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Must be signed in');
@@ -164,9 +156,9 @@ exports.update = onCall<UpdateFlashcardArgs>(
     await ref.set(
       {
         ...updates,
-        lastUpdated: FieldValue.serverTimestamp()
+        lastUpdated: FieldValue.serverTimestamp(),
       } satisfies UpdateFlashcard,
-      { merge: true }
+      { merge: true },
     );
 
     const updated = await ref.get();
@@ -174,32 +166,29 @@ exports.update = onCall<UpdateFlashcardArgs>(
     logger.info('flashcard updated', { id, uid: req.auth.uid });
 
     return { flashcard: toFlashcard(id, updated.data() as ReadFlashcard) };
-  }
+  },
 );
 
-exports.remove = onCall<DeleteFlashcardArgs>(
-  { enforceAppCheck, maxInstances: 1 },
-  async (req): Promise<void> => {
-    if (!req.auth) {
-      throw new HttpsError('unauthenticated', 'Must be signed in');
-    }
-
-    const { id } = req.data;
-    const db = getFirestore();
-    const ref = db.collection('flashcards').doc(id);
-
-    const snap = await ref.get();
-
-    if (!snap.exists) {
-      throw new HttpsError('not-found', 'Flashcard not found');
-    }
-
-    if ((snap.data() as ReadFlashcard).uid !== req.auth.uid) {
-      throw new HttpsError('permission-denied', 'Not your flashcard');
-    }
-
-    await ref.delete();
-
-    logger.info('flashcard deleted', { id, uid: req.auth.uid });
+exports.remove = onCall<DeleteFlashcardArgs>(OPTIONS, async (req): Promise<void> => {
+  if (!req.auth) {
+    throw new HttpsError('unauthenticated', 'Must be signed in');
   }
-);
+
+  const { id } = req.data;
+  const db = getFirestore();
+  const ref = db.collection('flashcards').doc(id);
+
+  const snap = await ref.get();
+
+  if (!snap.exists) {
+    throw new HttpsError('not-found', 'Flashcard not found');
+  }
+
+  if ((snap.data() as ReadFlashcard).uid !== req.auth.uid) {
+    throw new HttpsError('permission-denied', 'Not your flashcard');
+  }
+
+  await ref.delete();
+
+  logger.info('flashcard deleted', { id, uid: req.auth.uid });
+});

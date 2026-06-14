@@ -1,4 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { Flashcards } from '../../services/flashcards';
 
 @Component({
@@ -9,12 +10,17 @@ import { Flashcards } from '../../services/flashcards';
 })
 export class Dashboard implements OnInit {
   private flashcards = inject(Flashcards);
+  private message = inject(NzMessageService);
 
   async ngOnInit(): Promise<void> {
     try {
       console.log(await this.flashcards.getFlashcards());
+
+      this.message.success('Flashcards loaded');
     } catch (error) {
       console.error('getFlashcards()', error);
+
+      this.message.error('Failed to load flashcards');
     }
   }
 }
