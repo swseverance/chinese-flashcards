@@ -12,7 +12,7 @@ export class Dashboard implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      await this.flashcards.getFlashcards();
+      console.log(await this.flashcards.getFlashcards());
     } catch (error) {
       console.error('getFlashcards()', error);
     }
