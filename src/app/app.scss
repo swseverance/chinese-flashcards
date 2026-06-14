@@ -1,0 +1,17 @@
+nz-layout {
+  height: 100dvh;
+}
+
+nz-header {
+  flex: 0 0 auto;
+  padding: 0 16px;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.85);
+  border-bottom: 1px solid #1890ff;
+}
+
+nz-content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
