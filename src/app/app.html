@@ -1,5 +1,11 @@
 <nz-layout>
-  <nz-header><strong>Chinese Flashcards</strong></nz-header>
+  <nz-header>
+    <strong>Chinese Flashcards</strong>
+
+    @if (authenticated()) {
+      <button nz-button (click)="logout()" nzType="default">Logout</button>
+    }
+  </nz-header>
   <nz-content>
     <router-outlet />
   </nz-content>

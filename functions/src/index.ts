@@ -14,6 +14,8 @@ import {
 
 initializeApp();
 
+const enforceAppCheck = process.env.FUNCTIONS_EMULATOR !== 'true';
+
 const toneMap: Record<string, string> = {
   ā: 'a',
   á: 'a',
@@ -86,7 +88,7 @@ const toFlashcard = (id: string, data: ReadFlashcard): Flashcard => {
 };
 
 exports.create = onCall<CreateFlashcardArgs>(
-  { enforceAppCheck: true, maxInstances: 1 },
+  { enforceAppCheck, maxInstances: 1 },
   async (req): Promise<{ flashcard: Flashcard }> => {
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Must be signed in');
@@ -116,7 +118,7 @@ exports.create = onCall<CreateFlashcardArgs>(
 );
 
 exports.get = onCall(
-  { enforceAppCheck: true, maxInstances: 1 },
+  { enforceAppCheck, maxInstances: 1 },
   async (req): Promise<{ flashcards: Flashcard[] }> => {
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Must be signed in');
@@ -139,7 +141,7 @@ exports.get = onCall(
 );
 
 exports.update = onCall<UpdateFlashcardArgs>(
-  { enforceAppCheck: true, maxInstances: 1 },
+  { enforceAppCheck, maxInstances: 1 },
   async (req): Promise<{ flashcard: Flashcard }> => {
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Must be signed in');
@@ -176,7 +178,7 @@ exports.update = onCall<UpdateFlashcardArgs>(
 );
 
 exports.remove = onCall<DeleteFlashcardArgs>(
-  { enforceAppCheck: true, maxInstances: 1 },
+  { enforceAppCheck, maxInstances: 1 },
   async (req): Promise<void> => {
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Must be signed in');
