@@ -1,4 +1,4 @@
-<form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="!loading && onSubmit()">
+<form nz-form nzLayout="vertical" [formGroup]="form" (ngSubmit)="!loading() && onSubmit()">
   <nz-form-item>
     <nz-form-label nzRequired>Chinese</nz-form-label>
     <nz-form-control [nzErrorTip]="'Required'">
@@ -37,9 +37,17 @@
     </nz-form-control>
   </nz-form-item>
 
+  <nz-form-item></nz-form-item>
+
   <div class="footer">
     <button type="button" nz-button (click)="cancel()">Cancel</button>
-    <button type="submit" nz-button nzType="primary" [disabled]="form.invalid" [nzLoading]="loading">
+    <button
+      type="submit"
+      nz-button
+      nzType="primary"
+      [disabled]="form.invalid"
+      [nzLoading]="loading()"
+    >
       Save
     </button>
   </div>

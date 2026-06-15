@@ -120,7 +120,7 @@ exports.create = onCall<CreateFlashcardArgs>(
 
 exports.groups = onCall<{ type: FlashcardType }>(
   OPTIONS,
-  async (req): Promise<{ flashcards: [number, number][] }> => {
+  async (req): Promise<{ flashcards: Array<{ confidence: number; count: number }> }> => {
     if (!req.auth) {
       throw new HttpsError('unauthenticated', 'Must be signed in');
     }
@@ -142,7 +142,11 @@ exports.groups = onCall<{ type: FlashcardType }>(
       map.set(confidence, (map.get(confidence) ?? 0) + 1);
     }
 
-    return { flashcards: Array.from(map.entries()).sort(([a], [b]) => a - b) };
+    return {
+      flashcards: Array.from(map.entries())
+        .map(([confidence, count]) => ({ confidence, count }))
+        .sort((a, b) => a.confidence - b.confidence),
+    };
   },
 );
 

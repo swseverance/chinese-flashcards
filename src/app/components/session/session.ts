@@ -3,11 +3,11 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { NzModalModule, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { Edit } from '../edit/edit';
 import { Flashcard, FlashcardType } from '../../models';
 import { Flashcards } from '../../services/flashcards';
+import { Edit } from '../edit/edit';
 import { Page } from '../page/page';
 
 @Component({
@@ -28,6 +28,7 @@ export class Session implements OnInit {
   revealed = signal(false);
   type!: FlashcardType;
   confidence!: number;
+  ref: NzModalRef | null = null;
   cards = signal<Flashcard[]>([]);
 
   get current(): Flashcard | undefined {
@@ -48,10 +49,12 @@ export class Session implements OnInit {
     this.loading.set(true);
 
     try {
-      this.cards.set(await this.flashcards.getFlashcards({
-        type: this.type,
-        confidence: this.confidence,
-      }));
+      this.cards.set(
+        await this.flashcards.getFlashcards({
+          type: this.type,
+          confidence: this.confidence,
+        }),
+      );
     } catch (error) {
       console.error('getFlashcards()', error);
       this.message.error('Failed to load flashcards');
@@ -60,19 +63,21 @@ export class Session implements OnInit {
     }
   }
 
-  reveal(): void {
-    this.revealed.set(true);
+  toggle(): void {
+    this.revealed.update((value) => !value);
   }
 
   openEdit(): void {
-    const ref = this.modal.create({
+    this.ref = this.modal.create({
       nzTitle: 'Edit Flashcard',
       nzContent: Edit,
       nzData: { flashcard: this.current },
       nzFooter: null,
     });
 
-    ref.afterClose.subscribe((updated?: Flashcard) => {
+    this.ref.afterClose.subscribe((updated?: Flashcard) => {
+      this.ref = null;
+
       if (updated) {
         this.cards.update((cards) => cards.map((c) => (c.id === updated.id ? updated : c)));
       }

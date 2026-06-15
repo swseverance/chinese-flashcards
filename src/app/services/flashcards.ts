@@ -1,6 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { httpsCallable } from 'firebase/functions';
-import { CreateFlashcardArgs, Flashcard, FlashcardType, GetFlashcardsArgs, UpdateFlashcardArgs } from '../models';
+import {
+  CreateFlashcardArgs,
+  Flashcard,
+  FlashcardType,
+  GetFlashcardsArgs,
+  UpdateFlashcardArgs,
+} from '../models';
 import { FIREBASE_FUNCTIONS } from '../tokens/firebase';
 
 @Injectable({
@@ -18,18 +24,15 @@ export class Flashcards {
   }
 
   getGroups(type: FlashcardType) {
-    const fn = httpsCallable<{ type: FlashcardType }, { flashcards: [number, number][] }>(
-      this.functions,
-      'groups',
-    );
+    const fn = httpsCallable<
+      { type: FlashcardType },
+      { flashcards: Array<{ confidence: number; count: number }> }
+    >(this.functions, 'groups');
     return fn({ type }).then(({ data: { flashcards } }) => flashcards);
   }
 
   getFlashcards(args: GetFlashcardsArgs) {
-    const fn = httpsCallable<GetFlashcardsArgs, { flashcards: Flashcard[] }>(
-      this.functions,
-      'get',
-    );
+    const fn = httpsCallable<GetFlashcardsArgs, { flashcards: Flashcard[] }>(this.functions, 'get');
     return fn(args).then(({ data: { flashcards } }) => flashcards);
   }
 

@@ -11,7 +11,7 @@
     @if (loading()) {
       <nz-spin />
     } @else if (current) {
-      <button nz-button nzType="text" nzShape="circle" class="edit-btn" (click)="openEdit()">
+      <button nz-button nzType="text" nzShape="circle" class="edit-btn" (click)="!ref && openEdit()">
         <nz-icon nzType="edit" [style.color]="'#1890ff'" />
       </button>
 
@@ -33,9 +33,8 @@
         <button
           nz-button
           nzDanger
-          [disabled]="!!updating()"
           [nzLoading]="updating() === 'reset'"
-          (click)="setConfidence(0, 'reset')"
+          (click)="updating() !== 'reset' && setConfidence(0, 'reset')"
         >
           Reset
         </button>
@@ -43,8 +42,7 @@
         <button
           nz-button
           nzType="default"
-          [disabled]="revealed() || !!updating()"
-          (click)="reveal()"
+          (click)="!updating() && toggle()"
         >
           Reveal
         </button>
@@ -52,9 +50,8 @@
         <button
           nz-button
           nzType="primary"
-          [disabled]="!!updating()"
           [nzLoading]="updating() === 'increment'"
-          (click)="setConfidence(current.confidence + 1, 'increment')"
+          (click)="updating() !== 'increment' && setConfidence(current.confidence + 1, 'increment')"
         >
           Got it
         </button>

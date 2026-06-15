@@ -33,7 +33,7 @@ export class Study implements OnInit {
 
   loading = signal(false);
   type!: FlashcardType;
-  groups = signal<[number, number][]>([]);
+  groups = signal<Array<{ confidence: number; count: number }>>([]);
 
   async ngOnInit(): Promise<void> {
     this.type = this.route.snapshot.paramMap.get('type') as FlashcardType;

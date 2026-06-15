@@ -14,13 +14,13 @@
       <nz-empty nzNotFoundContent="No flashcards found" />
     } @else {
       <nz-list nzBordered>
-        @for (group of groups(); track group[0]) {
+        @for (group of groups(); track group.confidence) {
           <nz-list-item
             class="group-row"
-            [routerLink]="['/dashboard/study', type, group[0]]"
+            [routerLink]="['/dashboard/study', type, group.confidence]"
           >
-            <span>Level {{ group[0] }}</span>
-            <nz-badge [nzCount]="group[1]" [nzStyle]="{ backgroundColor: '#1890ff' }" />
+            <span>Level {{ group.confidence }}</span>
+            <nz-badge [nzCount]="group.count" [nzStyle]="{ backgroundColor: '#1890ff' }" />
           </nz-list-item>
         }
       </nz-list>
