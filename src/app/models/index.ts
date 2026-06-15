@@ -16,6 +16,11 @@ export type CreateFlashcardArgs = {
   type: FlashcardType;
 };
 
+export type GetFlashcardsArgs = {
+  type: FlashcardType;
+  confidence: number;
+};
+
 export type UpdateFlashcardArgs = {
   id: string;
   updates: {

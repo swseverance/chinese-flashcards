@@ -1,26 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { Flashcards } from '../../services/flashcards';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { NzListModule } from 'ng-zorro-antd/list';
+import { Page } from '../page/page';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [Page, NzListModule, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard implements OnInit {
-  private flashcards = inject(Flashcards);
-  private message = inject(NzMessageService);
-
-  async ngOnInit(): Promise<void> {
-    try {
-      console.log(await this.flashcards.getFlashcards());
-
-      this.message.success('Flashcards loaded');
-    } catch (error) {
-      console.error('getFlashcards()', error);
-
-      this.message.error('Failed to load flashcards');
-    }
-  }
-}
+export class Dashboard {}

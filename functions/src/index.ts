@@ -6,6 +6,7 @@ import {
   CreateFlashcardArgs,
   DeleteFlashcardArgs,
   Flashcard,
+  FlashcardType,
   ReadFlashcard,
   UpdateFlashcard,
   UpdateFlashcardArgs,
@@ -117,20 +118,56 @@ exports.create = onCall<CreateFlashcardArgs>(
   },
 );
 
-exports.get = onCall(OPTIONS, async (req): Promise<{ flashcards: Flashcard[] }> => {
-  if (!req.auth) {
-    throw new HttpsError('unauthenticated', 'Must be signed in');
-  }
+exports.groups = onCall<{ type: FlashcardType }>(
+  OPTIONS,
+  async (req): Promise<{ flashcards: [number, number][] }> => {
+    if (!req.auth) {
+      throw new HttpsError('unauthenticated', 'Must be signed in');
+    }
 
-  const db = getFirestore();
-  const snap = await db.collection('flashcards').where('uid', '==', req.auth.uid).get();
+    const db = getFirestore();
+    const snap = await db
+      .collection('flashcards')
+      .where('uid', '==', req.auth.uid)
+      .where('type', '==', req.data.type)
+      .get();
 
-  logger.info('flashcards fetched', { uid: req.auth.uid, count: snap.size });
+    logger.info('flashcards fetched', { uid: req.auth.uid, count: snap.size });
 
-  return {
-    flashcards: snap.docs.map((doc) => toFlashcard(doc.id, doc.data() as ReadFlashcard)),
-  };
-});
+    const map = new Map<number, number>();
+
+    for (const { confidence } of snap.docs.map((doc) =>
+      toFlashcard(doc.id, doc.data() as ReadFlashcard),
+    )) {
+      map.set(confidence, (map.get(confidence) ?? 0) + 1);
+    }
+
+    return { flashcards: Array.from(map.entries()).sort(([a], [b]) => a - b) };
+  },
+);
+
+exports.get = onCall<{ type: FlashcardType; confidence: number }>(
+  OPTIONS,
+  async (req): Promise<{ flashcards: Flashcard[] }> => {
+    if (!req.auth) {
+      throw new HttpsError('unauthenticated', 'Must be signed in');
+    }
+
+    const db = getFirestore();
+    const snap = await db
+      .collection('flashcards')
+      .where('uid', '==', req.auth.uid)
+      .where('type', '==', req.data.type)
+      .where('confidence', '==', req.data.confidence)
+      .get();
+
+    logger.info('flashcards fetched', { uid: req.auth.uid, count: snap.size });
+
+    return {
+      flashcards: snap.docs.map((doc) => toFlashcard(doc.id, doc.data() as ReadFlashcard)),
+    };
+  },
+);
 
 exports.update = onCall<UpdateFlashcardArgs>(
   OPTIONS,
