@@ -3,9 +3,57 @@
     <a nz-button nzType="default" nzShape="circle" routerLink="/dashboard">
       <nz-icon nzType="left" [style.color]="'#1890ff'" />
     </a>
-    
+
     <strong>Search</strong>
   </header>
 
-  <main>Content...</main>
+  <main>
+    <nz-input-group [nzPrefix]="prefixIcon">
+      <input
+        type="text"
+        nz-input
+        placeholder="Search by pinyin"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+      />
+    </nz-input-group>
+
+    <ng-template #prefixIcon>
+      <nz-icon nzType="search" />
+    </ng-template>
+
+    @if (loading()) {
+      <nz-spin />
+    } @else if (results().length === 0) {
+      <nz-empty nzNotFoundContent="No flashcards found" />
+    } @else {
+      <cdk-virtual-scroll-viewport itemSize="56" class="viewport">
+        <nz-list nzBordered>
+          <nz-list-item *cdkVirtualFor="let card of results(); trackBy: trackById" class="card-row">
+            <span class="chinese">{{ card.chinese }}</span>
+
+            <div class="card-actions">
+              <button
+                nz-button
+                nzType="text"
+                nzShape="circle"
+                (click)="!ref && openEdit(card)"
+              >
+                <nz-icon nzType="edit" [style.color]="'#1890ff'" />
+              </button>
+
+              <button
+                nz-button
+                nzType="text"
+                nzShape="circle"
+                (click)="!ref && openDelete(card)"
+              >
+                <nz-icon nzType="delete" [style.color]="'#ff4d4f'" />
+              </button>
+            </div>
+          </nz-list-item>
+        </nz-list>
+      </cdk-virtual-scroll-viewport>
+    }
+  </main>
 </app-page>

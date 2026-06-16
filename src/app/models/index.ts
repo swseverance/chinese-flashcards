@@ -17,8 +17,8 @@ export type CreateFlashcardArgs = {
 };
 
 export type GetFlashcardsArgs = {
-  type: FlashcardType;
-  confidence: number;
+  type?: FlashcardType;
+  confidence?: number;
 };
 
 export type UpdateFlashcardArgs = {

@@ -11,9 +11,27 @@
     @if (loading()) {
       <nz-spin />
     } @else if (current) {
-      <button nz-button nzType="text" nzShape="circle" class="edit-btn" (click)="!ref && openEdit()">
-        <nz-icon nzType="edit" [style.color]="'#1890ff'" />
-      </button>
+      <div class="button-container">
+        <button
+          nz-button
+          nzType="text"
+          nzShape="circle"
+          class="edit-btn"
+          (click)="!ref && openEdit()"
+        >
+          <nz-icon nzType="edit" [style.color]="'#1890ff'" />
+        </button>
+
+        <button
+          nz-button
+          nzType="text"
+          nzShape="circle"
+          class="delete-btn"
+          (click)="!ref && openDelete()"
+        >
+          <nz-icon nzType="delete" [style.color]="'#ff4d4f'" />
+        </button>
+      </div>
 
       <div class="card">
         <div class="chinese">{{ current.chinese }}</div>
@@ -39,13 +57,7 @@
           Reset
         </button>
 
-        <button
-          nz-button
-          nzType="default"
-          (click)="!updating() && toggle()"
-        >
-          Reveal
-        </button>
+        <button nz-button nzType="default" (click)="!updating() && toggle()">Reveal</button>
 
         <button
           nz-button

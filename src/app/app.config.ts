@@ -3,7 +3,13 @@ import en from '@angular/common/locales/en';
 import { ApplicationConfig, isDevMode, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
-import { EditOutline, LeftCircleTwoTone, LeftOutline } from '@ant-design/icons-angular/icons';
+import {
+  DeleteOutline,
+  EditOutline,
+  LeftCircleTwoTone,
+  LeftOutline,
+  SearchOutline,
+} from '@ant-design/icons-angular/icons';
 import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { routes } from './app.routes';
@@ -15,7 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideNzI18n(en_US),
-    provideNzIcons([LeftOutline, LeftCircleTwoTone, EditOutline]),
+    provideNzIcons([LeftOutline, LeftCircleTwoTone, EditOutline, DeleteOutline, SearchOutline]),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',

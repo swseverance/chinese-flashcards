@@ -84,6 +84,32 @@ export class Session implements OnInit {
     });
   }
 
+  openDelete(): void {
+    const card = this.current!;
+
+    this.ref = this.modal.confirm({
+      nzTitle: 'Delete flashcard?',
+      nzContent: `This card will be permanently deleted.`,
+      nzOkText: 'Delete',
+      nzOkDanger: true,
+      nzOnOk: () => this.deleteCard(card),
+    });
+
+    this.ref.afterClose.subscribe(() => (this.ref = null));
+  }
+
+  private async deleteCard(card: Flashcard): Promise<void> {
+    try {
+      await this.flashcards.deleteFlashcard(card.id);
+      this.cards.update((cards) => cards.filter((c) => c.id !== card.id));
+      this.message.success('Flashcard deleted');
+    } catch (error) {
+      console.error('deleteFlashcard()', error);
+      this.message.error('Failed to delete flashcard');
+      throw error;
+    }
+  }
+
   async setConfidence(confidence: number, action: 'reset' | 'increment'): Promise<void> {
     const card = this.current;
     if (!card || this.updating()) return;

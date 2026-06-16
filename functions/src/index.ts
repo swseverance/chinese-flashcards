@@ -150,7 +150,7 @@ exports.groups = onCall<{ type: FlashcardType }>(
   },
 );
 
-exports.get = onCall<{ type: FlashcardType; confidence: number }>(
+exports.get = onCall<{ type?: FlashcardType; confidence?: number }>(
   OPTIONS,
   async (req): Promise<{ flashcards: Flashcard[] }> => {
     if (!req.auth) {
@@ -158,12 +158,18 @@ exports.get = onCall<{ type: FlashcardType; confidence: number }>(
     }
 
     const db = getFirestore();
-    const snap = await db
-      .collection('flashcards')
-      .where('uid', '==', req.auth.uid)
-      .where('type', '==', req.data.type)
-      .where('confidence', '==', req.data.confidence)
-      .get();
+
+    let query = db.collection('flashcards').where('uid', '==', req.auth.uid);
+
+    if (req.data.type) {
+      query = query.where('type', '==', req.data.type);
+    }
+
+    if (req.data.confidence) {
+      query = query.where('confidence', '==', req.data.confidence);
+    }
+
+    const snap = await query.get();
 
     logger.info('flashcards fetched', { uid: req.auth.uid, count: snap.size });
 

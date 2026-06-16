@@ -41,11 +41,13 @@ nz-spin {
   padding: 24px;
 }
 
-.edit-btn {
+.button-container {
   position: absolute;
   top: 8px;
   right: 8px;
   z-index: 1;
+  display: flex;
+  gap: 8px;
 }
 
 .chinese {
@@ -79,8 +81,7 @@ nz-spin {
   justify-content: center;
   gap: 8px;
 
-
-button {
-  width: 100px;
-}
+  button {
+    width: 100px;
+  }
 }
