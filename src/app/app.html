@@ -7,6 +7,10 @@
     }
   </nz-header>
   <nz-content>
-    <router-outlet />
+    @if (displayLoader()) {
+      <nz-spin />
+    }
+
+    <router-outlet (activate)="displayLoader.set(false)" />
   </nz-content>
 </nz-layout>

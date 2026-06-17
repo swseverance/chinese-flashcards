@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { User } from 'firebase/auth';
 import { Observable, map, take } from 'rxjs';
 import { FIREBASE_AUTH } from '../../tokens/firebase';

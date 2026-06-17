@@ -5,12 +5,13 @@ import { signOut, User } from 'firebase/auth';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { Observable } from 'rxjs';
 import { FIREBASE_AUTH } from './tokens/firebase';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NzLayoutModule, NzButtonModule],
+  imports: [RouterOutlet, NzLayoutModule, NzButtonModule, NzSpinModule],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -21,6 +22,7 @@ export class App implements OnInit {
   private message = inject(NzMessageService);
 
   authenticated = signal<null | boolean>(null);
+  displayLoader = signal(true);
   logoutPending = false;
 
   async logout() {
